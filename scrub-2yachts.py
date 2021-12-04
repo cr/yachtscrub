@@ -18,14 +18,14 @@ def get_marketid(marketname):
 
 def get_boat(marketid, boatid):
     "retrieves a boat from db"
-    cur.execute('''SELECT rowid, boatid, created, changed, name, price 
+    cur.execute('''SELECT rowid, boatid, created, changed, name, price, year 
                     FROM boats
                     WHERE market = ? AND boatid = ?''', (marketid, boatid,))
     return cur.fetchone()
 
 def get_market_boats(marketid):
     "retrieves all boats of a market from db"
-    cur.execute('''SELECT rowid, boatid, created, changed, name, price 
+    cur.execute('''SELECT rowid, boatid, created, changed, name, price, year 
                     FROM boats
                     WHERE market = ?''', (marketid,))
     return cur.fetchall()
