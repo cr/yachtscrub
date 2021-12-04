@@ -30,10 +30,11 @@ def get_market_boats(marketid):
                     WHERE market = ?''', (marketid,))
     return cur.fetchall()
 
-def add_boat(marketid, boatid, created, changed, name, price):
+def add_boat(marketid, boatid, created, changed, name, price, year):
     "stores a boat in db"
-    cur.execute('''INSERT INTO boats (market, boatid, created, changed, name, price)
-                    VALUES (?, ?, ?, ?, ?, ?)''', (marketid, boatid, created, changed, name, price,))
+    cur.execute('''INSERT INTO boats (market, boatid, created, changed, name, price, year)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)''',
+	(marketid, boatid, created, changed, name, price, year))
     con.commit()
     return
 
@@ -60,13 +61,14 @@ for boat in boats:
     boatname = boat.find("span", itemprop="name").string
     boaturl = boat.find("meta", itemprop="url")["content"]
     boatprice = boat.find("meta", itemprop="price")["content"]
-    boatcur = boat.find("meta", itemprop="priceCurrency")["content"]
+    boatyear = boat.find("ul", itemprop="description").li.string
+    #boatcur = boat.find("meta", itemprop="priceCurrency")["content"]
     boatts = datetime.strptime(boat.find("div", class_="boat-row__added").string.strip(), '%H:%M %d.%m.%Y')
     
     dbboat = get_boat(marketid, boatid)
     if (dbboat is None): 
-        print("new boat id: "+boatid + " date: " + boatts.isoformat() + " name: " + boatname + " price: " + boatprice + " curr: " + boatcur)
-        add_boat(marketid, boatid, boatts, boatts, boatname, boatprice)
+        print("new boat id: "+boatid + " date: " + boatts.isoformat() + " name: " + boatname + " price: " + boatprice + " year: " + boatyear)
+        add_boat(marketid, boatid, boatts, boatts, boatname, boatprice, boatyear)
     else:
         print("previously known boat id: " + boatid)
     # TODO: find boats in DB but no longer in results (and delete them in db)

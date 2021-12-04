@@ -15,6 +15,7 @@ con.execute('''CREATE TABLE boats
          created  DATETIME,
          changed  DATETIME,
          price    INT,               -- in standard currency, rounded, no cents etc.
+         year     DATE,
          FOREIGN KEY(market) REFERENCES markets(rowid));''')
 
 con.close()
