@@ -5,29 +5,30 @@ import requests
 from datetime import datetime
 import sqlite3
 from os.path import exists
+import math
 
 def get_marketid(marketname):
     "retrieves marketid from db"
-    cur.execute("SELECT rowid FROM markets WHERE name = ?", (marketname,));
+    cur.execute("SELECT rowid FROM markets WHERE name = ?", (marketname,))
     row = cur.fetchone()
     if (row is None):
         return
     else:
-        return row[0];
+        return row[0]
 
 def get_boat(marketid, boatid):
     "retrieves a boat from db"
     cur.execute('''SELECT rowid, boatid, created, changed, name, price 
                     FROM boats
                     WHERE market = ? AND boatid = ?''', (marketid, boatid,))
-    return cur.fetchone();
+    return cur.fetchone()
 
 def get_market_boats(marketid):
     "retrieves all boats of a market from db"
     cur.execute('''SELECT rowid, boatid, created, changed, name, price 
                     FROM boats
                     WHERE market = ?''', (marketid,))
-    return cur.fetchall();
+    return cur.fetchall()
 
 def add_boat(marketid, boatid, created, changed, name, price):
     "stores a boat in db"
@@ -38,8 +39,6 @@ def add_boat(marketid, boatid, created, changed, name, price):
 
 con = sqlite3.connect('boats.db')
 cur = con.cursor()
-
-# TODO: find boats in DB but no longer in results (and delete them in db)
 
 # 2yachts.com
 marketid = get_marketid("2yachts")
@@ -52,6 +51,8 @@ else:
     soup = BeautifulSoup(sauce.content, 'html.parser')
 
 # TODO: retrieve all results (pagination!)
+#results = soup.find("h2", class_="market-header__note").span.string.replace(",","")
+#pages   = math.ceil(results / 50)
 # 2yachts: &page=2&per-page=50
 boats = soup.find_all("div", "boat-row")
 for boat in boats:
@@ -67,6 +68,9 @@ for boat in boats:
         print("new boat id: "+boatid + " date: " + boatts.isoformat() + " name: " + boatname + " price: " + boatprice + " curr: " + boatcur)
         add_boat(marketid, boatid, boatts, boatts, boatname, boatprice)
     else:
-        print("previously known boat id: " + boatid);
+        print("previously known boat id: " + boatid)
+    # TODO: find boats in DB but no longer in results (and delete them in db)
 
-
+con.close()
+exit(0)
+#eof. This file has not been truncate
